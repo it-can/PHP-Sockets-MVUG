@@ -89,7 +89,7 @@ class WebSocket{
 			"Sec-WebSocket-Key:" => "{$this->handshakeChallenge}",
 			"Sec-WebSocket-Origin:" => "{$this->origin}",
 			"Sec-WebSocket-Version:" => 8,
-			"Upgrade:" => websocket
+			"Upgrade:" => 'websocket'
 		);
 
 		return $this->headers;
