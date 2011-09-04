@@ -1,4 +1,18 @@
 <?php
+
+class WebSocketProtocolVersions{
+	const HIXIE_76 = 0;
+	const HYBI_8 = 8;
+	const HYBI_9 = 8;
+	const HYBI_10 = 8;
+	const HYBI_11 = 8;
+	const HYBI_12 = 8;
+	
+	const LATEST = self::HYBI_12;
+	
+	private function __construct(){}
+}
+
 class WebSocketFunctions{
 	/**
 	 * Parse a HTTP HEADER 'Cookie:' value into a key-value pair array

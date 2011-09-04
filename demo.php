@@ -2,7 +2,7 @@
 <?php
 
 // Run from command prompt > php demo.php
-require_once('websocket.server.php');
+require_once("websocket.server.php");
 
 /**
  * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
@@ -12,17 +12,21 @@ require_once('websocket.server.php');
  *
  */
 class DemoEchoHandler extends WebSocketResourceHandler{
-	public function onMessage(WebSocketUser $user, IWebSocketMessage $msg){
-		$text = $msg->getData();
+	public function onMessage(IWebSocketUser $user, IWebSocketMessage $msg){
+		$this->say("[ECHO] {$msg->getData()}");
 
-		$this->say("[MVUG] {".$text."}");
-
-		// Show message to all connected users
 		foreach ($this->users AS $user)
 		{
 			// Echo
-			$this->send($user, $text);
+			$this->send($user, $msg->getData());
 		}
+	}
+
+	public function onAdminMessage(IWebSocketUser $user, stdClass $obj){
+		$this->say("[DEMO] Admin TEST received!");
+
+		$frame = WebSocketFrame::create(WebSocketOpcode::PongFrame);
+		$this->server->sendFrame($user, $frame);
 	}
 }
 
@@ -34,24 +38,35 @@ class DemoEchoHandler extends WebSocketResourceHandler{
  *
  */
 class DemoSocketServer extends WebSocketServer{
+	public function getAdminKey(){
+		return "superdupersecretkey";
+	}
+
 	public function __construct($address, $port){
 		parent::__construct($address, $port);
 
-		$this->addResourceHandler('echo', new DemoEchoHandler());
+		$this->addResourceHandler("echo", new DemoEchoHandler());
 	}
-	protected function onConnect(WebSocketUser $user){
-		$this->say("[MVUG] {$user->id} connected");
+	protected function onConnect(IWebSocketUser $user){
+		$this->say("[DEMO] {$user->getId()} connected");
 	}
 
 	public function onMessage($user, IWebSocketMessage $msg){
-		$this->say("[MVUG] {$user->id} says '{$msg->getData()}'");
+		$this->say("[DEMO] {$user->getId()} says '{$msg->getData()}'");
 	}
 
-	protected function onDisconnect(WebSocketUser $user){
-		$this->say("[MVUG] {$user->id} disconnected");
+	protected function onDisconnect(IWebSocketUser $user){
+		$this->say("[DEMO] {$user->getId()} disconnected");
+	}
+
+	protected function onAdminTest(IWebSocketUser $user){
+		$this->say("[DEMO] Admin TEST received!");
+
+		$frame = WebSocketFrame::create(WebSocketOpcode::PongFrame);
+		$this->sendFrame($user, $frame);
 	}
 }
 
 // Start server
-$server = new DemoSocketServer('127.0.0.1', 12345);
+$server = new DemoSocketServer(0,12345);
 $server->run();

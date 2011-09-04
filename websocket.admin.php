@@ -1,4 +1,24 @@
 <?php
+require_once("websocket.client.php");
+
+class WebSocketAdminClient extends WebSocket{
+	protected $adminKey = null;
+	
+	public function __construct($url, $adminKey){
+		parent::__construct($url);
+		
+		$this->adminKey = $adminKey;
+		
+		$this->addHeader("Admin-Key", $adminKey);
+	}
+	
+	
+	public function sendMessage(WebSocketAdminMessage $msg){
+		$wsmsg = WebSocketMessage::create(json_encode($msg));
+		
+		parent::sendMessage($wsmsg);
+	}
+}
 
 /**
  * Helper class to send Admin Messages to the WebSocketServer
@@ -21,42 +41,10 @@ class WebSocketAdminMessage extends stdClass{
 	 * @param string $task
 	 * @return WebSocketAdminMessage
 	 */
-	public static function createGlobalMessage($task){
+	public static function create($task){
 		$o = new self();
 		$o->task = $task;
 		
 		return $o;
-	}
-	
-	/**
-	 * Create a message that will be send to a specific IWebSocketResourceHandler of the WebSocketServer
-	 *
-	 * @param string $resource
-	 * @param string $task
-	 * @return WebSocketAdminMessage
-	 */
-	public static function createMessage($resource, $task){
-		$o = new self();
-		$o->resource = $resource;
-		$o->task = $task;
-		
-		return $o;
-	}
-	
-	/**
-	 * Send the message to a specific server
-	 * 
-	 * @todo only 127.0.0.1 supported, since no admin authentication yet!
-	 * @param string $host
-	 * @param int $port
-	 */
-	public function send($host = '127.0.0.1', $port = 12345){
-		$socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		socket_connect($socket, $host, $port);
-		
-		$msg = json_encode($this);
-		
-		socket_write($socket, $msg, strlen($msg));
-		socket_close($socket);
 	}
 }

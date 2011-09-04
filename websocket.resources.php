@@ -1,9 +1,9 @@
 <?php
 interface IWebSocketResourceHandler{
-	public function addUser(WebSocketUser $user);
-	public function removeUser(WebSocketUser $user);
-	public function onMessage(WebSocketUser $user, IWebSocketMessage $msg);
-	public function onAdminMessage(WebSocketAdminUser $user, stdClass $msg);
+	public function addUser(IWebSocketUser $user);
+	public function removeUser(IWebSocketUser $user);
+	public function onMessage(IWebSocketUser $user, IWebSocketMessage $msg);
+	public function onAdminMessage(IWebSocketUser $user, stdClass $msg);
 	
 	public function setServer(WebSocketServer $server);
 }
@@ -29,11 +29,11 @@ abstract class WebSocketResourceHandler implements IWebSocketResourceHandler{
 		$this->users = new SplObjectStorage();
 	}
 	
-	public function addUser(WebSocketUser $user){
+	public function addUser(IWebSocketUser $user){
 		$this->users->attach($user);
 	}
 	
-	public function removeUser(WebSocketUser $user){
+	public function removeUser(IWebSocketUser $user){
 		$this->users->detach($user);
 	}
 	
@@ -45,12 +45,12 @@ abstract class WebSocketResourceHandler implements IWebSocketResourceHandler{
 		return $this->server->say($msg);
 	}
 	
-	public function send(WebSocketUser $client, $str){
+	public function send(IWebSocketUser $client, $str){
 		return $this->server->send($client, $str);
 	}
 	
-	public function onMessage(WebSocketUser $user, IWebSocketMessage $msg){}
-	public function onAdminMessage(WebSocketAdminUser $user, stdClass $msg){}
+	public function onMessage(IWebSocketUser $user, IWebSocketMessage $msg){}
+	public function onAdminMessage(IWebSocketUser $user, stdClass $msg){}
 	
 	//abstract public function onMessage(WebSocketUser $user, IWebSocketMessage $msg);
 } 

@@ -22,3 +22,12 @@ class WebSocketInvalidUrlScheme extends Exception{
 		parent::__construct("Only 'ws://' urls are supported!");
 	}
 }
+
+class WebSocketNotAuthorizedException extends Exception{
+	protected $user;
+	
+	public function __construct(IWebSocketUser $user){
+		parent::__construct("None or invalid credentials provided!");
+		$this->user = $user;
+	}
+}
